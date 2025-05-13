@@ -24,6 +24,8 @@ public class PlayerCamera : MonoBehaviour {
     private float defaultCameraPosition;//相机距离玩家的默认位置
     private float targetCameraPosition;//碰撞检测后，相机应该距离玩家的位置
     [SerializeField] private LayerMask mask;//碰撞检测的layer
+    [SerializeField] private GameObject cameraObject;//相机物体
+    private float sphereCastRadius = 0.2f;//检测球体的半径
     private MagicNumber magicNumber = new MagicNumber();
 
     private void Awake() {
@@ -33,6 +35,7 @@ public class PlayerCamera : MonoBehaviour {
         else{
             Destroy(gameObject);
         }
+        defaultCameraPosition = cameraObject.transform.localPosition.z;
     }
 
 
@@ -74,12 +77,25 @@ public class PlayerCamera : MonoBehaviour {
         transform.position = Vector3.SmoothDamp(transform.position, playerPosition, ref followVelocity,magicNumber.smoothTime * Time.deltaTime);
     }
 
-    private void CameraCollider(){
-        //与相机碰撞的碰撞体
+    /// <summary>
+    /// 以cameraPivot为球心，cameraObject - cameraPivot为方向，defaultCameraPosition为半径，发射一条射线
+    /// 如果射线碰撞到物体，说明相机与物体发生了碰撞
+    /// </summary>
+    private void CameraCollider() {
+        targetCameraPosition = defaultCameraPosition;//相机的目标距离
         RaycastHit hit;
-
-        //
-
+        Vector3 direction = (cameraObject.transform.position - cameraPivot.position).normalized;//射线方向
+        if (Physics.SphereCast(cameraPivot.position, sphereCastRadius, direction, out hit, -defaultCameraPosition, mask)) {
+            float dist = cameraPivot.position.z - cameraObject.transform.position.z - sphereCastRadius;//相机与玩家的z距离
+            if(dist <= sphereCastRadius){
+                dist = sphereCastRadius;
+            }
+            targetCameraPosition = -dist;
+            Debug.Log("######3");
+        }
+        Vector3 targetLocalPosition = Vector3.zero;
+        targetLocalPosition.z = Mathf.Lerp(cameraObject.transform.localPosition.z, targetCameraPosition,magicNumber.smoothTime);
+        cameraObject.transform.localPosition = targetLocalPosition;
     }
 
     private void LateUpdate() {
@@ -88,6 +104,7 @@ public class PlayerCamera : MonoBehaviour {
         //相机碰撞，避免穿模
         FollowPlayer();
         CameraRoate();
+        CameraCollider();
     }
 
 }
