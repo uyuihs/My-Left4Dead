@@ -15,6 +15,10 @@ public class PlayerInputManager :  NetworkBehaviour{
     private bool isSprinting = false;
     private bool isWalk = false;
 
+    //=============Debug输入相关===============
+    private Vector3 debugToTheWall;
+
+
     private void Awake() {
         playerLocomotionManager = GetComponent<PlayerLocomotionManager>();
         playerAnimatorManager = GetComponent<PlayerAnimatorManager>(); 
@@ -29,9 +33,19 @@ public class PlayerInputManager :  NetworkBehaviour{
             inputController.PlayerMove.Sprinting.canceled += ctx => isSprinting = false;
             inputController.PlayerMove.Walk.performed += ctx => isWalk = true;
             inputController.PlayerMove.Walk.canceled += ctx => isWalk = false;
+
+            //Debug输入
+            DebugInput();
         }
 
         inputController.Enable();
+    }
+
+    private void DebugInput(){//Debug输入
+        inputController.PlayerDebug.ToTheWall.performed += ctx =>{
+            debugToTheWall = new Vector3(6.8f, 11f, -9f);
+            playerLocomotionManager.transform.position = debugToTheWall;
+        };
     }
 
     private void GetMoveAmount(){

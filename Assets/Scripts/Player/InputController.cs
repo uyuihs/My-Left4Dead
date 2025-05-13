@@ -182,6 +182,34 @@ public partial class @InputController: IInputActionCollection2, IDisposable
                     ""isPartOfComposite"": false
                 }
             ]
+        },
+        {
+            ""name"": ""PlayerDebug"",
+            ""id"": ""0181ac43-a78c-4cd5-b566-3b40ce4e1eee"",
+            ""actions"": [
+                {
+                    ""name"": ""ToTheWall"",
+                    ""type"": ""Button"",
+                    ""id"": ""195c1113-f15e-471c-9117-e27280357a8b"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""3213d20e-37e6-4bb2-a0f6-0c4feb2df45e"",
+                    ""path"": ""<Keyboard>/j"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ToTheWall"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
         }
     ],
     ""controlSchemes"": []
@@ -195,6 +223,9 @@ public partial class @InputController: IInputActionCollection2, IDisposable
         // CameraMove
         m_CameraMove = asset.FindActionMap("CameraMove", throwIfNotFound: true);
         m_CameraMove_Move = m_CameraMove.FindAction("Move", throwIfNotFound: true);
+        // PlayerDebug
+        m_PlayerDebug = asset.FindActionMap("PlayerDebug", throwIfNotFound: true);
+        m_PlayerDebug_ToTheWall = m_PlayerDebug.FindAction("ToTheWall", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -368,6 +399,52 @@ public partial class @InputController: IInputActionCollection2, IDisposable
         }
     }
     public CameraMoveActions @CameraMove => new CameraMoveActions(this);
+
+    // PlayerDebug
+    private readonly InputActionMap m_PlayerDebug;
+    private List<IPlayerDebugActions> m_PlayerDebugActionsCallbackInterfaces = new List<IPlayerDebugActions>();
+    private readonly InputAction m_PlayerDebug_ToTheWall;
+    public struct PlayerDebugActions
+    {
+        private @InputController m_Wrapper;
+        public PlayerDebugActions(@InputController wrapper) { m_Wrapper = wrapper; }
+        public InputAction @ToTheWall => m_Wrapper.m_PlayerDebug_ToTheWall;
+        public InputActionMap Get() { return m_Wrapper.m_PlayerDebug; }
+        public void Enable() { Get().Enable(); }
+        public void Disable() { Get().Disable(); }
+        public bool enabled => Get().enabled;
+        public static implicit operator InputActionMap(PlayerDebugActions set) { return set.Get(); }
+        public void AddCallbacks(IPlayerDebugActions instance)
+        {
+            if (instance == null || m_Wrapper.m_PlayerDebugActionsCallbackInterfaces.Contains(instance)) return;
+            m_Wrapper.m_PlayerDebugActionsCallbackInterfaces.Add(instance);
+            @ToTheWall.started += instance.OnToTheWall;
+            @ToTheWall.performed += instance.OnToTheWall;
+            @ToTheWall.canceled += instance.OnToTheWall;
+        }
+
+        private void UnregisterCallbacks(IPlayerDebugActions instance)
+        {
+            @ToTheWall.started -= instance.OnToTheWall;
+            @ToTheWall.performed -= instance.OnToTheWall;
+            @ToTheWall.canceled -= instance.OnToTheWall;
+        }
+
+        public void RemoveCallbacks(IPlayerDebugActions instance)
+        {
+            if (m_Wrapper.m_PlayerDebugActionsCallbackInterfaces.Remove(instance))
+                UnregisterCallbacks(instance);
+        }
+
+        public void SetCallbacks(IPlayerDebugActions instance)
+        {
+            foreach (var item in m_Wrapper.m_PlayerDebugActionsCallbackInterfaces)
+                UnregisterCallbacks(item);
+            m_Wrapper.m_PlayerDebugActionsCallbackInterfaces.Clear();
+            AddCallbacks(instance);
+        }
+    }
+    public PlayerDebugActions @PlayerDebug => new PlayerDebugActions(this);
     public interface IPlayerMoveActions
     {
         void OnMove(InputAction.CallbackContext context);
@@ -378,5 +455,9 @@ public partial class @InputController: IInputActionCollection2, IDisposable
     public interface ICameraMoveActions
     {
         void OnMove(InputAction.CallbackContext context);
+    }
+    public interface IPlayerDebugActions
+    {
+        void OnToTheWall(InputAction.CallbackContext context);
     }
 }

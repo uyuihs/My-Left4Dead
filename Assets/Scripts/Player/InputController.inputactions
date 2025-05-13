@@ -160,6 +160,34 @@
                     "isPartOfComposite": false
                 }
             ]
+        },
+        {
+            "name": "PlayerDebug",
+            "id": "0181ac43-a78c-4cd5-b566-3b40ce4e1eee",
+            "actions": [
+                {
+                    "name": "ToTheWall",
+                    "type": "Button",
+                    "id": "195c1113-f15e-471c-9117-e27280357a8b",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "3213d20e-37e6-4bb2-a0f6-0c4feb2df45e",
+                    "path": "<Keyboard>/j",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "ToTheWall",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
         }
     ],
     "controlSchemes": []
