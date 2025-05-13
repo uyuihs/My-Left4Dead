@@ -17,6 +17,12 @@ public class PlayerNetworkManager : NetworkBehaviour {
         NetworkVariableReadPermission.Everyone,
         NetworkVariableWritePermission.Owner);//同步玩家的旋转
 
+    private NetworkVariable<float> moveAmount = 
+        new NetworkVariable<float>(0f,
+        NetworkVariableReadPermission.Everyone,
+        NetworkVariableWritePermission.Owner);//同步玩家的移动量
+
+
     public Vector3 PlayerPosition
     {
         get { return playerPosition.Value; }
@@ -29,6 +35,11 @@ public class PlayerNetworkManager : NetworkBehaviour {
         set { playerRotation.Value = value; }
     }
 
+    public float MoveAmount
+    {
+        get { return moveAmount.Value; }
+        set { moveAmount.Value = value; }
+    }
 
 
 }

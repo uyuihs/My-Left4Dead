@@ -26,7 +26,7 @@ public class PlayerCamera : MonoBehaviour {
     [SerializeField] private LayerMask mask;//碰撞检测的layer
     [SerializeField] private GameObject cameraObject;//相机物体
     private float sphereCastRadius = 0.2f;//检测球体的半径
-    private MagicNumber magicNumber = new MagicNumber();
+
 
     private void Awake() {
         if(Singleton == null){
@@ -47,10 +47,10 @@ public class PlayerCamera : MonoBehaviour {
         verticalRotation = rotate.y;
     
         //计算水平旋转量
-        totalhorizontalRotation += horizontalRotation * magicNumber.rotatespeed * Time.deltaTime;
+        totalhorizontalRotation += horizontalRotation * MagicNumber.Singleton.rotatespeed * Time.deltaTime;
 
         //计算垂直旋转量，向下为正方向，且在（-30,30）范围之内
-        totalVerticalRotation -= verticalRotation * magicNumber.rotatespeed * Time.deltaTime;
+        totalVerticalRotation -= verticalRotation * MagicNumber.Singleton.rotatespeed * Time.deltaTime;
         totalVerticalRotation = Mathf.Clamp(totalVerticalRotation, -limitRotation, limitRotation);
 
     }
@@ -74,7 +74,7 @@ public class PlayerCamera : MonoBehaviour {
     }
 
     private void FollowPlayer(){
-        transform.position = Vector3.SmoothDamp(transform.position, playerPosition, ref followVelocity,magicNumber.smoothTime * Time.deltaTime);
+        transform.position = Vector3.SmoothDamp(transform.position, playerPosition, ref followVelocity,MagicNumber.Singleton.smoothTime * Time.deltaTime);
     }
 
     /// <summary>
@@ -91,10 +91,9 @@ public class PlayerCamera : MonoBehaviour {
                 dist = sphereCastRadius;
             }
             targetCameraPosition = -dist;
-            Debug.Log("######3");
         }
         Vector3 targetLocalPosition = Vector3.zero;
-        targetLocalPosition.z = Mathf.Lerp(cameraObject.transform.localPosition.z, targetCameraPosition,magicNumber.smoothTime);
+        targetLocalPosition.z = Mathf.Lerp(cameraObject.transform.localPosition.z, targetCameraPosition,MagicNumber.Singleton.smoothTime);
         cameraObject.transform.localPosition = targetLocalPosition;
     }
 
