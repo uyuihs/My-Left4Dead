@@ -12,8 +12,9 @@ public class PlayerInputManager :  NetworkBehaviour{
     private PlayerLocomotionManager playerLocomotionManager;//玩家控制器的引用
     private PlayerAnimatorManager playerAnimatorManager;
     private float moveAmount;
+    private bool isSprinting = false;
+    private bool isWalk = false;
 
-    private bool isRuning = false;
     private void Awake() {
         playerLocomotionManager = GetComponent<PlayerLocomotionManager>();
         playerAnimatorManager = GetComponent<PlayerAnimatorManager>(); 
@@ -24,8 +25,10 @@ public class PlayerInputManager :  NetworkBehaviour{
             inputController = new InputController();
             inputController.PlayerMove.Move.performed += ctx => playerMove = ctx.ReadValue<Vector2>();
             inputController.CameraMove.Move.performed += ctx => cameraMove = ctx.ReadValue<Vector2>(); 
-            inputController.PlayerMove.Run.performed += ctx => isRuning = true;
-            inputController.PlayerMove.Run.canceled += ctx => isRuning = false;
+            inputController.PlayerMove.Sprinting.performed += ctx => isSprinting = true;
+            inputController.PlayerMove.Sprinting.canceled += ctx => isSprinting = false;
+            inputController.PlayerMove.Walk.performed += ctx => isWalk = true;
+            inputController.PlayerMove.Walk.canceled += ctx => isWalk = false;
         }
 
         inputController.Enable();
@@ -34,15 +37,20 @@ public class PlayerInputManager :  NetworkBehaviour{
     private void GetMoveAmount(){
         //计算moveAmount
         moveAmount = Mathf.Abs(playerMove.x) > MagicNumber.Singleton.zeroEps ? 
-            Mathf.Abs(playerMove.x): Mathf.Abs(playerMove.y);
-        //moveAmount 只为0、1、2,表示静止不动，walk,run
-        if(moveAmount < MagicNumber.Singleton.upperEps && moveAmount >MagicNumber.Singleton.lowerEps){
-            moveAmount = 1f;
+            MagicNumber.Singleton.upperEps: Mathf.Abs(playerMove.y) > MagicNumber.Singleton.zeroEps?
+            MagicNumber.Singleton.upperEps: MagicNumber.Singleton.zeroEps;//若有一个输入，则为0.5
+        //moveAmount 只为0、1、2、4,表示静止不动，walk,run
+        if(moveAmount <= MagicNumber.Singleton.upperEps &&
+            moveAmount >MagicNumber.Singleton.lowerEps && isWalk){
+            moveAmount = 0.5f;
         }
         else if(moveAmount < MagicNumber.Singleton.lowerEps){
             moveAmount = MagicNumber.Singleton.zeroEps;
         }
-        if(moveAmount > MagicNumber.Singleton.zeroEps && isRuning){
+        else {//若没按下ctrl,则是跑步
+            moveAmount = 1f;
+        }
+        if(moveAmount > MagicNumber.Singleton.zeroEps && isSprinting){//若按下shift,则为冲刺
             moveAmount = 2f;
         }
     }
