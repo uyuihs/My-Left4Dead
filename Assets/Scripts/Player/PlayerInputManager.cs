@@ -13,6 +13,7 @@ public class PlayerInputManager :  NetworkBehaviour{
     private PlayerAnimatorManager playerAnimatorManager;
     private float moveAmount;
 
+    private bool isRuning = false;
     private void Awake() {
         playerLocomotionManager = GetComponent<PlayerLocomotionManager>();
         playerAnimatorManager = GetComponent<PlayerAnimatorManager>(); 
@@ -23,25 +24,26 @@ public class PlayerInputManager :  NetworkBehaviour{
             inputController = new InputController();
             inputController.PlayerMove.Move.performed += ctx => playerMove = ctx.ReadValue<Vector2>();
             inputController.CameraMove.Move.performed += ctx => cameraMove = ctx.ReadValue<Vector2>(); 
+            inputController.PlayerMove.Run.performed += ctx => isRuning = true;
+            inputController.PlayerMove.Run.canceled += ctx => isRuning = false;
         }
 
         inputController.Enable();
     }
 
     private void GetMoveAmount(){
-        moveAmount = Mathf.Clamp01(Mathf.Abs(playerMove.x) + Mathf.Abs(playerMove.y));
-
         //计算moveAmount
-        moveAmount = Mathf.Clamp01(Mathf.Abs(playerMove.x) + Mathf.Abs(playerMove.y));
-        //moveAmount 只为0、0.5、1,表示静止不动，walk,run
-        if(moveAmount <MagicNumber.Singleton.upperEps && moveAmount >MagicNumber.Singleton.lowerEps){
-            moveAmount = 0.5f;
-        }
-        else if(moveAmount <MagicNumber.Singleton.lowerEps){
-            moveAmount = 0f;
-        }
-        else{
+        moveAmount = Mathf.Abs(playerMove.x) > MagicNumber.Singleton.zeroEps ? 
+            Mathf.Abs(playerMove.x): Mathf.Abs(playerMove.y);
+        //moveAmount 只为0、1、2,表示静止不动，walk,run
+        if(moveAmount < MagicNumber.Singleton.upperEps && moveAmount >MagicNumber.Singleton.lowerEps){
             moveAmount = 1f;
+        }
+        else if(moveAmount < MagicNumber.Singleton.lowerEps){
+            moveAmount = MagicNumber.Singleton.zeroEps;
+        }
+        if(moveAmount > MagicNumber.Singleton.zeroEps && isRuning){
+            moveAmount = 2f;
         }
     }
 

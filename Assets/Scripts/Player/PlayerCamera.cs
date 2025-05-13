@@ -86,14 +86,14 @@ public class PlayerCamera : MonoBehaviour {
         RaycastHit hit;
         Vector3 direction = (cameraObject.transform.position - cameraPivot.position).normalized;//射线方向
         if (Physics.SphereCast(cameraPivot.position, sphereCastRadius, direction, out hit, -defaultCameraPosition, mask)) {
-            float dist = cameraPivot.position.z - cameraObject.transform.position.z - sphereCastRadius;//相机与玩家的z距离
-            if(dist <= sphereCastRadius){
-                dist = sphereCastRadius;
-            }
+            float dist = cameraPivot.position.z - hit.point.z - sphereCastRadius;//相机与碰撞物体的距离
             targetCameraPosition = -dist;
+             if(dist <= sphereCastRadius){
+                dist = sphereCastRadius * 2;
+            }
         }
         Vector3 targetLocalPosition = Vector3.zero;
-        targetLocalPosition.z = Mathf.Lerp(cameraObject.transform.localPosition.z, targetCameraPosition,MagicNumber.Singleton.smoothTime);
+        targetLocalPosition.z = Mathf.Lerp(cameraObject.transform.localPosition.z, targetCameraPosition, MagicNumber.Singleton.smoothTime);
         cameraObject.transform.localPosition = targetLocalPosition;
     }
 
