@@ -89,7 +89,7 @@ public class PlayerCamera : MonoBehaviour {
             float dist = cameraPivot.position.z - hit.point.z - sphereCastRadius;//相机与碰撞物体的距离
             targetCameraPosition = -dist;
              if(dist <= sphereCastRadius){
-                dist = sphereCastRadius * 2;
+                targetCameraPosition = -sphereCastRadius;//相机与角色之间的距离很小，则用碰撞半径来设置距离
             }
         }
         Vector3 targetLocalPosition = Vector3.zero;
