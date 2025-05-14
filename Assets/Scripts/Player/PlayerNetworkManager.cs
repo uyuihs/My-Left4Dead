@@ -22,6 +22,12 @@ public class PlayerNetworkManager : NetworkBehaviour {
         NetworkVariableReadPermission.Everyone,
         NetworkVariableWritePermission.Owner);//同步玩家的移动量
 
+    private PlayerAnimatorManager playerAnimatorManager;//玩家动画管理器的引用
+
+    private void Awake() {
+        playerAnimatorManager = GetComponent<PlayerAnimatorManager>();
+    }
+
 
     public Vector3 PlayerPosition
     {
@@ -39,6 +45,16 @@ public class PlayerNetworkManager : NetworkBehaviour {
     {
         get { return moveAmount.Value; }
         set { moveAmount.Value = value; }
+    }
+
+    [ServerRpc]
+    public void PlayTargetAnimationServerRpc(string targetAnim){
+        PlayTargetAnimationClientRpc(targetAnim);
+    }
+
+    [ClientRpc]
+    public void PlayTargetAnimationClientRpc(string targetAnim){
+        playerAnimatorManager.PlayTargetAnimation(targetAnim);
     }
 
 

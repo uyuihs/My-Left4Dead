@@ -96,12 +96,11 @@ public class PlayerLocomotionManager : NetworkBehaviour {
             //TODO：播放动画
             
         if (moveAmount > MagicNumber.Singleton.zeroEps){//非静止状态时，翻滚
-            playerAnimatorManager.PlayTargetAnimation("Rolling");
-
+            playerNetworkManager.PlayTargetAnimationServerRpc("Rolling");
         }
 
         else {//否则为向后跳跃
-            playerAnimatorManager.PlayTargetAnimation("BackStep");
+            playerNetworkManager.PlayTargetAnimationServerRpc("BackStep");
         }
     }
 
