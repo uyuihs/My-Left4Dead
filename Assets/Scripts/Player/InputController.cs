@@ -47,11 +47,11 @@ public partial class @InputController: IInputActionCollection2, IDisposable
                 },
                 {
                     ""name"": ""Sprinting"",
-                    ""type"": ""Button"",
+                    ""type"": ""PassThrough"",
                     ""id"": ""050c8da7-7756-487e-aa96-e4beb68ae32f"",
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
-                    ""interactions"": ""Tap"",
+                    ""interactions"": ""Hold"",
                     ""initialStateCheck"": false
                 },
                 {
@@ -69,7 +69,7 @@ public partial class @InputController: IInputActionCollection2, IDisposable
                     ""id"": ""b722383c-1cb4-4996-aee8-37f62fc8a56b"",
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
-                    ""interactions"": """",
+                    ""interactions"": ""Tap"",
                     ""initialStateCheck"": false
                 }
             ],

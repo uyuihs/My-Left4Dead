@@ -32,8 +32,8 @@ public class PlayerInputManager :  NetworkBehaviour{
             inputController = new InputController();
             inputController.PlayerMove.Move.performed += ctx => playerMove = ctx.ReadValue<Vector2>();
             inputController.CameraMove.Move.performed += ctx => cameraMove = ctx.ReadValue<Vector2>(); 
-            // inputController.PlayerMove.Sprinting.performed += ctx => isSprinting = true;
-            // inputController.PlayerMove.Sprinting.canceled += ctx => isSprinting = false;
+            inputController.PlayerMove.Sprinting.performed += ctx => isSprinting = true;
+            inputController.PlayerMove.Sprinting.canceled += ctx => isSprinting = false;
             inputController.PlayerMove.Walk.performed += ctx => isWalk = true;
             inputController.PlayerMove.Walk.canceled += ctx => isWalk = false;
             inputController.PlayerMove.Dodge.performed += ctx => rollInput = true;
