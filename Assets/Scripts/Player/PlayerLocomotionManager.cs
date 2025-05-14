@@ -101,7 +101,7 @@ public class PlayerLocomotionManager : NetworkBehaviour {
         }
 
         else {//否则为向后跳跃
-            //播放动画
+            playerAnimatorManager.PlayTargetAnimation("BackStep");
         }
     }
 
