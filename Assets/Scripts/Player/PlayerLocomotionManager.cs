@@ -16,9 +16,21 @@ public class PlayerLocomotionManager : NetworkBehaviour {
     private Vector3 targetDirection = Vector3.zero;
     private PlayerNetworkManager playerNetworkManager;//玩家网络管理器的引用
 
+    //============Player下落、跳跃相关逻辑===========
+    [SerializeField] private LayerMask groundLayer;
+    private PlayerAnimatorManager playerAnimatorManager;
+
+    //============翻滚相关逻辑================
+    private Vector3 rollDirection = Vector3.zero;
+
+    //============debug相关输入==============
+    private Vector3 lastPosition = Vector3.zero;
+
     private void Awake() {
         rb = GetComponent<Rigidbody>();
         playerNetworkManager = GetComponent<PlayerNetworkManager>();
+        playerAnimatorManager = GetComponent<PlayerAnimatorManager>();
+        lastPosition = transform.position;
     }
 
     //接受input的输入
@@ -31,6 +43,8 @@ public class PlayerLocomotionManager : NetworkBehaviour {
     }
 
     private void HandlePlayerMovement(){
+        if (!PlayerMoveStatus.Singleton.IsEnableMove()) { return; }
+        
         //玩家的移动方向以屏幕方向为基，水平移动量和竖直移动量的线性组合
         moveDirection = 
             (PlayerCamera.Singleton.transform.right * moveHorizontal  + 
@@ -42,6 +56,8 @@ public class PlayerLocomotionManager : NetworkBehaviour {
     }
 
     private void HandlePlayerRotation(){
+        if(!PlayerMoveStatus.Singleton.IsEnableRoate()) { return; }
+
         //玩家的旋转的旋转方向以屏幕方向为基，水平移动量和竖直移动量的线性组合
         targetDirection = moveDirection == Vector3.zero? transform.forward : moveDirection;
         targetRotation = Quaternion.LookRotation(targetDirection);
@@ -64,8 +80,37 @@ public class PlayerLocomotionManager : NetworkBehaviour {
         }
     }
 
+    public void AtemptedPerformDodge(){
+        if(PlayerMoveStatus.Singleton.IsAnimationLocked()) { return; }//当前在播放不可以打断的动画，返回
+
+        rollDirection  = 
+            (PlayerCamera.Singleton.transform.right * moveHorizontal  + 
+            PlayerCamera.Singleton.transform.forward * moveVertical).normalized;
+
+            Quaternion rotation = Quaternion.LookRotation(rollDirection);
+            transform.rotation = rotation;
+
+            //玩家状态：允许根运动、锁定动画，不允许切换
+            PlayerMoveStatus.Singleton.EnableAnimationLocked();
+            PlayerMoveStatus.Singleton.EnableRootMotion();
+            //TODO：播放动画
+            
+        if (moveAmount > MagicNumber.Singleton.zeroEps){//非静止状态时，翻滚
+            playerAnimatorManager.PlayTargetAnimation("Rolling");
+
+        }
+
+        else {//否则为向后跳跃
+            //播放动画
+        }
+    }
+
+
     private void FixedUpdate() {
+        Vector3 deltaposition = transform.position - lastPosition;
+        lastPosition = transform.position;
         PerformMove();
+        Debug.Log(Mathf.Sqrt(deltaposition.x * deltaposition.x + deltaposition.z * deltaposition.z + deltaposition.y * deltaposition.y));
     }
 
 }

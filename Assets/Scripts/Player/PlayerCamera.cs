@@ -25,7 +25,6 @@ public class PlayerCamera : MonoBehaviour {
     private float targetCameraPosition;//碰撞检测后，相机应该距离玩家的位置
     [SerializeField] private LayerMask mask;//碰撞检测的layer
     [SerializeField] private GameObject cameraObject;//相机物体
-    private float sphereCastRadius = 0.2f;//检测球体的半径
 
 
     private void Awake() {
@@ -85,11 +84,11 @@ public class PlayerCamera : MonoBehaviour {
         targetCameraPosition = defaultCameraPosition;//相机的目标距离
         RaycastHit hit;
         Vector3 direction = (cameraObject.transform.position - cameraPivot.position).normalized;//射线方向
-        if (Physics.SphereCast(cameraPivot.position, sphereCastRadius, direction, out hit, -defaultCameraPosition, mask)) {
-            float dist = cameraPivot.position.z - hit.point.z - sphereCastRadius;//相机与碰撞物体的距离
+        if (Physics.SphereCast(cameraPivot.position, MagicNumber.Singleton.sphereCastRadius, direction, out hit, -defaultCameraPosition, mask)) {
+            float dist = cameraPivot.position.z - hit.point.z - MagicNumber.Singleton.sphereCastRadius;//相机与碰撞物体的距离
             targetCameraPosition = -dist;
-             if(dist <= sphereCastRadius){
-                targetCameraPosition = -sphereCastRadius;//相机与角色之间的距离很小，则用碰撞半径来设置距离
+             if(dist <= MagicNumber.Singleton.sphereCastRadius){
+                targetCameraPosition = -MagicNumber.Singleton.sphereCastRadius;//相机与角色之间的距离很小，则用碰撞半径来设置距离
             }
         }
         Vector3 targetLocalPosition = Vector3.zero;

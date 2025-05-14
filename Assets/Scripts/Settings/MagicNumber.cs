@@ -22,4 +22,6 @@ public class MagicNumber : MonoBehaviour
     public float movespeed = 3f;//玩家移动速度,一秒移动2
     public float rotatespeed = 4f;//玩家旋转速度
     public float smoothTime = 0.2f;//平滑时间
+    public float sphereCastRadius = 0.2f;
+
 }

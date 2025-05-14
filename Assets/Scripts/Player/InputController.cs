@@ -51,13 +51,22 @@ public partial class @InputController: IInputActionCollection2, IDisposable
                     ""id"": ""050c8da7-7756-487e-aa96-e4beb68ae32f"",
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
-                    ""interactions"": """",
+                    ""interactions"": ""Tap"",
                     ""initialStateCheck"": false
                 },
                 {
                     ""name"": ""Walk"",
                     ""type"": ""Button"",
                     ""id"": ""a9d6aee9-f56e-408f-9ba4-c476c7c19314"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Dodge"",
+                    ""type"": ""Button"",
+                    ""id"": ""b722383c-1cb4-4996-aee8-37f62fc8a56b"",
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": """",
@@ -152,6 +161,17 @@ public partial class @InputController: IInputActionCollection2, IDisposable
                     ""action"": ""Walk"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""2a54ef45-7781-41da-8185-3b01f5bdfcbd"",
+                    ""path"": ""<Keyboard>/shift"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Dodge"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         },
@@ -220,6 +240,7 @@ public partial class @InputController: IInputActionCollection2, IDisposable
         m_PlayerMove_Jump = m_PlayerMove.FindAction("Jump", throwIfNotFound: true);
         m_PlayerMove_Sprinting = m_PlayerMove.FindAction("Sprinting", throwIfNotFound: true);
         m_PlayerMove_Walk = m_PlayerMove.FindAction("Walk", throwIfNotFound: true);
+        m_PlayerMove_Dodge = m_PlayerMove.FindAction("Dodge", throwIfNotFound: true);
         // CameraMove
         m_CameraMove = asset.FindActionMap("CameraMove", throwIfNotFound: true);
         m_CameraMove_Move = m_CameraMove.FindAction("Move", throwIfNotFound: true);
@@ -291,6 +312,7 @@ public partial class @InputController: IInputActionCollection2, IDisposable
     private readonly InputAction m_PlayerMove_Jump;
     private readonly InputAction m_PlayerMove_Sprinting;
     private readonly InputAction m_PlayerMove_Walk;
+    private readonly InputAction m_PlayerMove_Dodge;
     public struct PlayerMoveActions
     {
         private @InputController m_Wrapper;
@@ -299,6 +321,7 @@ public partial class @InputController: IInputActionCollection2, IDisposable
         public InputAction @Jump => m_Wrapper.m_PlayerMove_Jump;
         public InputAction @Sprinting => m_Wrapper.m_PlayerMove_Sprinting;
         public InputAction @Walk => m_Wrapper.m_PlayerMove_Walk;
+        public InputAction @Dodge => m_Wrapper.m_PlayerMove_Dodge;
         public InputActionMap Get() { return m_Wrapper.m_PlayerMove; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -320,6 +343,9 @@ public partial class @InputController: IInputActionCollection2, IDisposable
             @Walk.started += instance.OnWalk;
             @Walk.performed += instance.OnWalk;
             @Walk.canceled += instance.OnWalk;
+            @Dodge.started += instance.OnDodge;
+            @Dodge.performed += instance.OnDodge;
+            @Dodge.canceled += instance.OnDodge;
         }
 
         private void UnregisterCallbacks(IPlayerMoveActions instance)
@@ -336,6 +362,9 @@ public partial class @InputController: IInputActionCollection2, IDisposable
             @Walk.started -= instance.OnWalk;
             @Walk.performed -= instance.OnWalk;
             @Walk.canceled -= instance.OnWalk;
+            @Dodge.started -= instance.OnDodge;
+            @Dodge.performed -= instance.OnDodge;
+            @Dodge.canceled -= instance.OnDodge;
         }
 
         public void RemoveCallbacks(IPlayerMoveActions instance)
@@ -451,6 +480,7 @@ public partial class @InputController: IInputActionCollection2, IDisposable
         void OnJump(InputAction.CallbackContext context);
         void OnSprinting(InputAction.CallbackContext context);
         void OnWalk(InputAction.CallbackContext context);
+        void OnDodge(InputAction.CallbackContext context);
     }
     public interface ICameraMoveActions
     {

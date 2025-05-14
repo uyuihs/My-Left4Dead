@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
+using System;
 
 public class PlayerAnimatorManager : NetworkBehaviour {
     //=============Player移动动画相关逻辑===============
@@ -26,6 +27,14 @@ public class PlayerAnimatorManager : NetworkBehaviour {
         animator.SetFloat(verticalHash, moveAmount, MagicNumber.Singleton.smoothTime, Time.fixedDeltaTime);
     }
 
+    //TODO 修改flags
+    public void PlayTargetAnimation(string targetAnim){//播放目标动画
+        animator.applyRootMotion = PlayerMoveStatus.Singleton.IsEnableRootMotion();
+        animator.CrossFade(targetAnim, MagicNumber.Singleton.smoothTime);
+    }
+
+
+
     private void FixedUpdate() {
         if(IsOwner){
             playerNetworkManager.MoveAmount = moveAmount;               
@@ -35,5 +44,6 @@ public class PlayerAnimatorManager : NetworkBehaviour {
         }
         PerformAnimatorMove();
     }
+
 
 }

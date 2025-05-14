@@ -18,6 +18,9 @@ public class PlayerInputManager :  NetworkBehaviour{
     //=============Debug输入相关===============
     private Vector3 debugToTheWall;
 
+    //============翻滚相关输入===============
+    private bool rollInput = false;
+
 
     private void Awake() {
         playerLocomotionManager = GetComponent<PlayerLocomotionManager>();
@@ -29,10 +32,11 @@ public class PlayerInputManager :  NetworkBehaviour{
             inputController = new InputController();
             inputController.PlayerMove.Move.performed += ctx => playerMove = ctx.ReadValue<Vector2>();
             inputController.CameraMove.Move.performed += ctx => cameraMove = ctx.ReadValue<Vector2>(); 
-            inputController.PlayerMove.Sprinting.performed += ctx => isSprinting = true;
-            inputController.PlayerMove.Sprinting.canceled += ctx => isSprinting = false;
+            // inputController.PlayerMove.Sprinting.performed += ctx => isSprinting = true;
+            // inputController.PlayerMove.Sprinting.canceled += ctx => isSprinting = false;
             inputController.PlayerMove.Walk.performed += ctx => isWalk = true;
             inputController.PlayerMove.Walk.canceled += ctx => isWalk = false;
+            inputController.PlayerMove.Dodge.performed += ctx => rollInput = true;
 
             //Debug输入
             DebugInput();
@@ -69,12 +73,20 @@ public class PlayerInputManager :  NetworkBehaviour{
         }
     }
 
+    private void HandleDodgeInput(){
+        if(rollInput){
+            rollInput = false;
+            playerLocomotionManager.AtemptedPerformDodge();
+        }
+    }
+
     private void Update() {
         if(IsOwner){
             GetMoveAmount();
             playerLocomotionManager.Move(playerMove, moveAmount);
             PlayerCamera.Singleton.Rotate(cameraMove);
             playerAnimatorManager.Move(moveAmount);
+            HandleDodgeInput();
         }
     }
 }
