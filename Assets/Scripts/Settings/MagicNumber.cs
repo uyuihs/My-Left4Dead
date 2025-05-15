@@ -14,6 +14,11 @@ public class MagicNumber : MonoBehaviour
             Destroy(gameObject);
         }
     }
+
+    private void Start() {
+        DontDestroyOnLoad(gameObject);
+    }
+
     //=============魔数相关属性===============
     public float upperEps = 0.5f; //浮点精度数误差上限，0.5能被IEEE754表示
     public float lowerEps = 0.05f;//浮点数精度误差下限

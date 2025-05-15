@@ -11,6 +11,7 @@ public class PlayerInputManager :  NetworkBehaviour{
     private Vector2 cameraMove;//摄像机移动方向
     private PlayerLocomotionManager playerLocomotionManager;//玩家控制器的引用
     private PlayerAnimatorManager playerAnimatorManager;
+    private PlayerNetworkManager playerNetworkManager;
     private float moveAmount;
     private bool isSprinting = false;
     private bool isWalk = false;
@@ -21,10 +22,14 @@ public class PlayerInputManager :  NetworkBehaviour{
     //============翻滚相关输入===============
     private bool rollInput = false;
 
+    //============跳跃相关输入===============
+    private bool jumpInput = false;
+
 
     private void Awake() {
         playerLocomotionManager = GetComponent<PlayerLocomotionManager>();
         playerAnimatorManager = GetComponent<PlayerAnimatorManager>(); 
+        playerNetworkManager = GetComponent<PlayerNetworkManager>();
         
     }
     private void OnEnable(){
@@ -37,6 +42,7 @@ public class PlayerInputManager :  NetworkBehaviour{
             inputController.PlayerMove.Walk.performed += ctx => isWalk = true;
             inputController.PlayerMove.Walk.canceled += ctx => isWalk = false;
             inputController.PlayerMove.Dodge.performed += ctx => rollInput = true;
+            inputController.PlayerMove.Jump.performed += ctx => jumpInput = true;
 
             //Debug输入
             DebugInput();
@@ -68,8 +74,16 @@ public class PlayerInputManager :  NetworkBehaviour{
         else {//若没按下ctrl,则是跑步
             moveAmount = 1f;
         }
-        if(moveAmount > MagicNumber.Singleton.zeroEps && isSprinting){//若按下shift,则为冲刺
+        if(moveAmount > MagicNumber.Singleton.zeroEps && isSprinting && 
+            playerNetworkManager.CurrentStamina > 0){//若按下shift,且有耐力值，则为冲刺
             moveAmount = 2f;
+        }
+
+        if(moveAmount == 2){
+            PlayerMoveStatus.Singleton.SetSprint();
+        }
+        else {
+            PlayerMoveStatus.Singleton.UnsetSprint();
         }
     }
 
@@ -77,6 +91,12 @@ public class PlayerInputManager :  NetworkBehaviour{
         if(rollInput){
             rollInput = false;
             playerLocomotionManager.AtemptedPerformDodge();
+        }
+    }
+
+    private void HadnleJumpInput(){
+        if(jumpInput){
+            jumpInput = false;
         }
     }
 

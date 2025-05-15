@@ -15,21 +15,12 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "Jump",
-                    "type": "Button",
-                    "id": "4615d6c1-e9df-47cb-8162-43b79a25ed39",
-                    "expectedControlType": "Button",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
-                },
-                {
                     "name": "Sprinting",
                     "type": "PassThrough",
                     "id": "050c8da7-7756-487e-aa96-e4beb68ae32f",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": "Hold",
+                    "interactions": "Hold(duration=0.5)",
                     "initialStateCheck": false
                 },
                 {
@@ -47,7 +38,16 @@
                     "id": "b722383c-1cb4-4996-aee8-37f62fc8a56b",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": "Tap",
+                    "interactions": "Tap(pressPoint=0.2)",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Jump",
+                    "type": "Button",
+                    "id": "c7a16f11-a592-4bfb-8867-3e4f60ee0481",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "Tap(pressPoint=0.2)",
                     "initialStateCheck": false
                 }
             ],
@@ -109,17 +109,6 @@
                 },
                 {
                     "name": "",
-                    "id": "620e53ce-c2e7-446f-afcc-5ff32d5fc109",
-                    "path": "<Keyboard>/space",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Jump",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
                     "id": "3a10944a-bb4c-45dd-af85-9fd9056c5424",
                     "path": "<Keyboard>/shift",
                     "interactions": "",
@@ -150,6 +139,17 @@
                     "action": "Dodge",
                     "isComposite": false,
                     "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "3bbb708e-1828-4ab9-8a07-ffedaf97451e",
+                    "path": "<Keyboard>/shift",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Jump",
+                    "isComposite": false,
+                    "isPartOfComposite": false
                 }
             ]
         },
@@ -161,7 +161,7 @@
                     "name": "Move",
                     "type": "PassThrough",
                     "id": "db051b54-a899-476d-8194-f431cbf905bb",
-                    "expectedControlType": "Vector2",
+                    "expectedControlType": "Analog",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false

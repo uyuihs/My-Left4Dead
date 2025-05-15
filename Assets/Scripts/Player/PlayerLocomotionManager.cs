@@ -23,8 +23,20 @@ public class PlayerLocomotionManager : NetworkBehaviour {
     //============翻滚相关逻辑================
     private Vector3 rollDirection = Vector3.zero;
 
+
     //============debug相关输入==============
     private Vector3 lastPosition = Vector3.zero;
+
+    //============耐力相关===================
+    private uint rollDec = 10;
+    private const uint sprintDecNum = 5;
+    private float sprintDecTick = 0;
+    private const float SprintTickLimit = 1f;
+    private const float staminaTickLimit = 2.5f;//计时器大于该门限值，开始回复耐力
+    private float staminaTickCount = 0;
+    private const float staminaTickBlockTimeLimit = 1f;//恢复的单位为1秒
+    private float staminaTickBlockTime = 0;
+    private uint staminaRecover = 3;
 
     private void Awake() {
         rb = GetComponent<Rigidbody>();
@@ -53,6 +65,15 @@ public class PlayerLocomotionManager : NetworkBehaviour {
         moveDirection.y = 0;//y轴不参与移动
         rb.MovePosition(rb.position + moveDirection * moveAmount * Time.fixedDeltaTime);
         PlayerCamera.Singleton.SetPosition(transform.position);
+        
+        //若是在奔跑，则每秒减少耐力值
+        if(PlayerMoveStatus.Singleton.IsSprint()){
+            sprintDecTick += Time.fixedDeltaTime;
+            if(sprintDecTick >= SprintTickLimit){
+                sprintDecTick = MagicNumber.Singleton.zeroEps;
+                playerNetworkManager.DecStamina(sprintDecNum);
+            }
+        }
     }
 
     private void HandlePlayerRotation(){
@@ -71,6 +92,7 @@ public class PlayerLocomotionManager : NetworkBehaviour {
         if(IsOwner){
             HandlePlayerMovement();
             HandlePlayerRotation();
+            AtemptedRecoverStamina();
             playerNetworkManager.PlayerPosition = transform.position;
             playerNetworkManager.PlayerRotation = transform.rotation;            
         }
@@ -82,6 +104,8 @@ public class PlayerLocomotionManager : NetworkBehaviour {
 
     public void AtemptedPerformDodge(){
         if(PlayerMoveStatus.Singleton.IsAnimationLocked()) { return; }//当前在播放不可以打断的动画，返回
+
+        if(playerNetworkManager.CurrentStamina <= 0) { return; }
 
         rollDirection  = 
             (PlayerCamera.Singleton.transform.right * moveHorizontal  + 
@@ -102,14 +126,35 @@ public class PlayerLocomotionManager : NetworkBehaviour {
         else {//否则为向后跳跃
             playerNetworkManager.PlayTargetAnimationServerRpc("BackStep");
         }
+
+        playerNetworkManager.DecStamina(rollDec);
+    }
+
+    public void AtemptedRecoverStamina(){
+        //没有处于动画锁定状态、冲刺状态、或当前耐力值等于最大耐力值时，不能恢复
+        if (PlayerMoveStatus.Singleton.IsAnimationLocked()|| 
+            PlayerMoveStatus.Singleton.IsSprint() || 
+            playerNetworkManager.CurrentStamina == playerNetworkManager.MaxStamina) {
+                staminaTickCount = 0;
+                return;
+        }
+        staminaTickCount += Time.fixedDeltaTime;
+
+        if(staminaTickCount >= staminaTickLimit){
+            staminaTickBlockTime += Time.fixedDeltaTime;
+            if(staminaTickBlockTime >= staminaTickBlockTimeLimit){
+                staminaTickBlockTime = 0;
+                staminaTickBlockTime = MagicNumber.Singleton.zeroEps;
+                playerNetworkManager.IncStamina(staminaRecover);
+            }
+        }
+
     }
 
 
     private void FixedUpdate() {
-        Vector3 deltaposition = transform.position - lastPosition;
-        lastPosition = transform.position;
         PerformMove();
-        Debug.Log(Mathf.Sqrt(deltaposition.x * deltaposition.x + deltaposition.z * deltaposition.z + deltaposition.y * deltaposition.y));
+
     }
 
 }

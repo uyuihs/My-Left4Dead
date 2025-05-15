@@ -27,7 +27,7 @@ public class PlayerAnimatorManager : NetworkBehaviour {
         animator.SetFloat(verticalHash, moveAmount, MagicNumber.Singleton.smoothTime, Time.fixedDeltaTime);
     }
 
-    //TODO 修改flags
+
     public void PlayTargetAnimation(string targetAnim){//播放目标动画
         animator.applyRootMotion = PlayerMoveStatus.Singleton.IsEnableRootMotion();
         animator.CrossFade(targetAnim, MagicNumber.Singleton.smoothTime);
