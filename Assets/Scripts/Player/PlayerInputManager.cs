@@ -63,7 +63,7 @@ public class PlayerInputManager :  NetworkBehaviour{
         moveAmount = Mathf.Abs(playerMove.x) > MagicNumber.Singleton.zeroEps ? 
             MagicNumber.Singleton.upperEps: Mathf.Abs(playerMove.y) > MagicNumber.Singleton.zeroEps?
             MagicNumber.Singleton.upperEps: MagicNumber.Singleton.zeroEps;//若有一个输入，则为0.5
-        //moveAmount 只为0、1、2、4,表示静止不动，walk,run
+        //moveAmount 只为0、0.5、0.75、1,表示静止不动，walk,run，sprint
         if(moveAmount <= MagicNumber.Singleton.upperEps &&
             moveAmount >MagicNumber.Singleton.lowerEps && isWalk){
             moveAmount = 0.5f;
@@ -72,14 +72,14 @@ public class PlayerInputManager :  NetworkBehaviour{
             moveAmount = MagicNumber.Singleton.zeroEps;
         }
         else {//若没按下ctrl,则是跑步
-            moveAmount = 1f;
+            moveAmount = 0.75f;
         }
         if(moveAmount > MagicNumber.Singleton.zeroEps && isSprinting && 
             playerNetworkManager.CurrentStamina > 0){//若按下shift,且有耐力值，则为冲刺
-            moveAmount = 2f;
+            moveAmount = 1f;
         }
 
-        if(moveAmount == 2){
+        if(moveAmount == 1){
             PlayerMoveStatus.Singleton.SetSprint();
         }
         else {
