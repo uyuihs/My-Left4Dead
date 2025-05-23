@@ -100,7 +100,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &2023226820694782799
 Transform:
   m_ObjectHideFlags: 0
@@ -129,8 +129,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a12d916c418535042ab77dca2377baf8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerCamera: {fileID: 0}
-  cameraPivot: {fileID: 0}
+  playerCamera: {fileID: 2023226820694782799}
+  cameraPivot: {fileID: 2023226820866129964}
+  mask:
+    serializedVersion: 2
+    m_Bits: 1
+  cameraObject: {fileID: 2023226819886098883}
 --- !u!1 &2023226820866129967
 GameObject:
   m_ObjectHideFlags: 0

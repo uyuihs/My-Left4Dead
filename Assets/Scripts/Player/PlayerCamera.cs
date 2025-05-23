@@ -96,13 +96,15 @@ public class PlayerCamera : MonoBehaviour {
         cameraObject.transform.localPosition = targetLocalPosition;
     }
 
-    private void LateUpdate() {
+    private void LateUpdate()
+    {
         //相机跟随玩家
         //相机绕玩家旋转
         //相机碰撞，避免穿模
         FollowPlayer();
         CameraRoate();
-        CameraCollider();
+        //TODO: 处理武器和相机碰撞导致的角色穿模
+        // CameraCollider();
     }
 
 }
