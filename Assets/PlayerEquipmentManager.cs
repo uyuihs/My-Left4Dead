@@ -13,11 +13,13 @@ public class PlayerEquipmentManager : MonoBehaviour
     private TwoBoneIKConstraint leftHandIK;
     private TwoBoneIKConstraint rightHandIK;
     private RigBuilder rigBuilder;
+    private MultiPositionConstraint amingConstraint;
 
     private void Awake()
     {
         playerAnimatorManager = GetComponent<PlayerAnimatorManager>();
         rigBuilder = GetComponent<RigBuilder>();
+        amingConstraint = GetComponentInChildren<MultiPositionConstraint>();
         LoadWeaponLoaderSlots();
 
     }
@@ -52,6 +54,7 @@ public class PlayerEquipmentManager : MonoBehaviour
         {
             rightHandIK.data.target = rightIKTarget.transform;
         }
+        // amingConstraint.data.sourceObjects = weaponLoadSolt.currentWeaponModel.transform;
         rigBuilder.Build();
     }
 

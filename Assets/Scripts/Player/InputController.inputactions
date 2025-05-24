@@ -193,6 +193,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "injured",
+                    "type": "Button",
+                    "id": "6acc4a1e-623e-4648-b0d2-d161475f1a72",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -204,6 +213,45 @@
                     "processors": "",
                     "groups": "",
                     "action": "ToTheWall",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "c5989dda-9c2f-4a5b-9031-c01d371b8dd0",
+                    "path": "<Keyboard>/l",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "injured",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        },
+        {
+            "name": "Toggle",
+            "id": "bd6c0d35-a1ee-4ab8-9128-47a04a0ffda3",
+            "actions": [
+                {
+                    "name": "EuqipRifle",
+                    "type": "Button",
+                    "id": "9905e6ba-2437-4236-a196-72510a758ff0",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "917bdbd5-4a81-40f0-92d6-bee8d38656d3",
+                    "path": "<Keyboard>/1",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "EuqipRifle",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

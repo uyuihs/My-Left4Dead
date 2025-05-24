@@ -7,17 +7,19 @@ using System;
 public class PlayerAnimatorManager : NetworkBehaviour
 {
     //=============Player移动动画相关逻辑===============
-    private Animator animator;
+    public Animator animator;
     private PlayerNetworkManager playerNetworkManager;//玩家网络管理器的引用
     private int horizontalHash;//缓存哈希值，减少计算量
     private int verticalHash;
     private float moveAmount;//移动量0,0.5,1
+    private int injuredLayer;
     private void Awake()
     {
         animator = GetComponent<Animator>();
         playerNetworkManager = GetComponent<PlayerNetworkManager>();
         horizontalHash = Animator.StringToHash("Horizontal");
         verticalHash = Animator.StringToHash("Vertical");
+        injuredLayer = animator.GetLayerIndex("Injured");
     }
     public void Move(float _moveAmount)
     {
@@ -31,6 +33,13 @@ public class PlayerAnimatorManager : NetworkBehaviour
         animator.SetFloat(verticalHash, moveAmount, MagicNumber.Singleton.smoothTime, Time.fixedDeltaTime);
     }
 
+    public void SetLayerWeight(string name, float weight)
+    {
+        if (name == "Injured")
+        {
+            animator.SetLayerWeight(injuredLayer, weight);
+        }
+    }
 
     public void PlayTargetAnimation(string targetAnim)
     {//播放目标动画

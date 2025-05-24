@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
+using Unity.VisualScripting.ReorderableList.Element_Adder_Menu;
 
 public class PlayerInputManager :  NetworkBehaviour{
 
@@ -15,6 +16,10 @@ public class PlayerInputManager :  NetworkBehaviour{
     private float moveAmount;
     private bool isSprinting = false;
     private bool isWalk = false;
+    private bool rifleInput = false;
+    private bool rifleEquip = false;
+    private bool injuredTriggle = false;
+    private bool injure = false;
 
     //=============Debug输入相关===============
     private Vector3 debugToTheWall;
@@ -43,6 +48,7 @@ public class PlayerInputManager :  NetworkBehaviour{
             inputController.PlayerMove.Walk.canceled += ctx => isWalk = false;
             inputController.PlayerMove.Dodge.performed += ctx => rollInput = true;
             inputController.PlayerMove.Jump.performed += ctx => jumpInput = true;
+            inputController.Toggle.EuqipRifle.performed += ctx => rifleInput = true;
 
             //Debug输入
             DebugInput();
@@ -51,11 +57,14 @@ public class PlayerInputManager :  NetworkBehaviour{
         inputController.Enable();
     }
 
-    private void DebugInput(){//Debug输入
-        inputController.PlayerDebug.ToTheWall.performed += ctx =>{
+    private void DebugInput()
+    {//Debug输入
+        inputController.PlayerDebug.ToTheWall.performed += ctx =>
+        {
             debugToTheWall = new Vector3(6.8f, 11f, -9f);
             playerLocomotionManager.transform.position = debugToTheWall;
         };
+        inputController.PlayerDebug.injured.performed += ctx => injuredTriggle = true;
     }
 
     private void GetMoveAmount(){
@@ -100,9 +109,43 @@ public class PlayerInputManager :  NetworkBehaviour{
         }
     }
 
-    private void Update() {
-        if(IsOwner){
+    private void HandleRifleInput()
+    {
+        if (rifleInput)
+        {
+            rifleInput = false;
+            rifleEquip = !rifleEquip;
+            playerAnimatorManager.animator.SetBool("Rifle", rifleEquip);
+        }
+    }
+
+    private void Injured()
+    {
+        if (injuredTriggle)
+        {
+            injuredTriggle = false;
+            injure = !injure;
+            if (injure) playerAnimatorManager.SetLayerWeight("Injured", 1);
+            else playerAnimatorManager.SetLayerWeight("Injured", 0);
+        }
+        else
+        {
+
+        }
+    }
+
+    private void HandleWeaponEquipment()
+    {
+        HandleRifleInput();
+    }
+
+    private void Update()
+    {
+        if (IsOwner)
+        {
+            HandleRifleInput();
             GetMoveAmount();
+            Injured();
             playerLocomotionManager.Move(playerMove, moveAmount);
             PlayerCamera.Singleton.Rotate(cameraMove);
             playerAnimatorManager.Move(moveAmount);

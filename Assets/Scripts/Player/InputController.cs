@@ -215,6 +215,15 @@ public partial class @InputController: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""injured"",
+                    ""type"": ""Button"",
+                    ""id"": ""6acc4a1e-623e-4648-b0d2-d161475f1a72"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -226,6 +235,45 @@ public partial class @InputController: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""ToTheWall"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""c5989dda-9c2f-4a5b-9031-c01d371b8dd0"",
+                    ""path"": ""<Keyboard>/l"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""injured"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
+        },
+        {
+            ""name"": ""Toggle"",
+            ""id"": ""bd6c0d35-a1ee-4ab8-9128-47a04a0ffda3"",
+            ""actions"": [
+                {
+                    ""name"": ""EuqipRifle"",
+                    ""type"": ""Button"",
+                    ""id"": ""9905e6ba-2437-4236-a196-72510a758ff0"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""917bdbd5-4a81-40f0-92d6-bee8d38656d3"",
+                    ""path"": ""<Keyboard>/1"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""EuqipRifle"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -247,6 +295,10 @@ public partial class @InputController: IInputActionCollection2, IDisposable
         // PlayerDebug
         m_PlayerDebug = asset.FindActionMap("PlayerDebug", throwIfNotFound: true);
         m_PlayerDebug_ToTheWall = m_PlayerDebug.FindAction("ToTheWall", throwIfNotFound: true);
+        m_PlayerDebug_injured = m_PlayerDebug.FindAction("injured", throwIfNotFound: true);
+        // Toggle
+        m_Toggle = asset.FindActionMap("Toggle", throwIfNotFound: true);
+        m_Toggle_EuqipRifle = m_Toggle.FindAction("EuqipRifle", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -433,11 +485,13 @@ public partial class @InputController: IInputActionCollection2, IDisposable
     private readonly InputActionMap m_PlayerDebug;
     private List<IPlayerDebugActions> m_PlayerDebugActionsCallbackInterfaces = new List<IPlayerDebugActions>();
     private readonly InputAction m_PlayerDebug_ToTheWall;
+    private readonly InputAction m_PlayerDebug_injured;
     public struct PlayerDebugActions
     {
         private @InputController m_Wrapper;
         public PlayerDebugActions(@InputController wrapper) { m_Wrapper = wrapper; }
         public InputAction @ToTheWall => m_Wrapper.m_PlayerDebug_ToTheWall;
+        public InputAction @injured => m_Wrapper.m_PlayerDebug_injured;
         public InputActionMap Get() { return m_Wrapper.m_PlayerDebug; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -450,6 +504,9 @@ public partial class @InputController: IInputActionCollection2, IDisposable
             @ToTheWall.started += instance.OnToTheWall;
             @ToTheWall.performed += instance.OnToTheWall;
             @ToTheWall.canceled += instance.OnToTheWall;
+            @injured.started += instance.OnInjured;
+            @injured.performed += instance.OnInjured;
+            @injured.canceled += instance.OnInjured;
         }
 
         private void UnregisterCallbacks(IPlayerDebugActions instance)
@@ -457,6 +514,9 @@ public partial class @InputController: IInputActionCollection2, IDisposable
             @ToTheWall.started -= instance.OnToTheWall;
             @ToTheWall.performed -= instance.OnToTheWall;
             @ToTheWall.canceled -= instance.OnToTheWall;
+            @injured.started -= instance.OnInjured;
+            @injured.performed -= instance.OnInjured;
+            @injured.canceled -= instance.OnInjured;
         }
 
         public void RemoveCallbacks(IPlayerDebugActions instance)
@@ -474,6 +534,52 @@ public partial class @InputController: IInputActionCollection2, IDisposable
         }
     }
     public PlayerDebugActions @PlayerDebug => new PlayerDebugActions(this);
+
+    // Toggle
+    private readonly InputActionMap m_Toggle;
+    private List<IToggleActions> m_ToggleActionsCallbackInterfaces = new List<IToggleActions>();
+    private readonly InputAction m_Toggle_EuqipRifle;
+    public struct ToggleActions
+    {
+        private @InputController m_Wrapper;
+        public ToggleActions(@InputController wrapper) { m_Wrapper = wrapper; }
+        public InputAction @EuqipRifle => m_Wrapper.m_Toggle_EuqipRifle;
+        public InputActionMap Get() { return m_Wrapper.m_Toggle; }
+        public void Enable() { Get().Enable(); }
+        public void Disable() { Get().Disable(); }
+        public bool enabled => Get().enabled;
+        public static implicit operator InputActionMap(ToggleActions set) { return set.Get(); }
+        public void AddCallbacks(IToggleActions instance)
+        {
+            if (instance == null || m_Wrapper.m_ToggleActionsCallbackInterfaces.Contains(instance)) return;
+            m_Wrapper.m_ToggleActionsCallbackInterfaces.Add(instance);
+            @EuqipRifle.started += instance.OnEuqipRifle;
+            @EuqipRifle.performed += instance.OnEuqipRifle;
+            @EuqipRifle.canceled += instance.OnEuqipRifle;
+        }
+
+        private void UnregisterCallbacks(IToggleActions instance)
+        {
+            @EuqipRifle.started -= instance.OnEuqipRifle;
+            @EuqipRifle.performed -= instance.OnEuqipRifle;
+            @EuqipRifle.canceled -= instance.OnEuqipRifle;
+        }
+
+        public void RemoveCallbacks(IToggleActions instance)
+        {
+            if (m_Wrapper.m_ToggleActionsCallbackInterfaces.Remove(instance))
+                UnregisterCallbacks(instance);
+        }
+
+        public void SetCallbacks(IToggleActions instance)
+        {
+            foreach (var item in m_Wrapper.m_ToggleActionsCallbackInterfaces)
+                UnregisterCallbacks(item);
+            m_Wrapper.m_ToggleActionsCallbackInterfaces.Clear();
+            AddCallbacks(instance);
+        }
+    }
+    public ToggleActions @Toggle => new ToggleActions(this);
     public interface IPlayerMoveActions
     {
         void OnMove(InputAction.CallbackContext context);
@@ -489,5 +595,10 @@ public partial class @InputController: IInputActionCollection2, IDisposable
     public interface IPlayerDebugActions
     {
         void OnToTheWall(InputAction.CallbackContext context);
+        void OnInjured(InputAction.CallbackContext context);
+    }
+    public interface IToggleActions
+    {
+        void OnEuqipRifle(InputAction.CallbackContext context);
     }
 }
