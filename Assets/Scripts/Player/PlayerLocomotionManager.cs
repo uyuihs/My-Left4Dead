@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 
-public class PlayerLocomotionManager : NetworkBehaviour {
-    
+public class PlayerLocomotionManager : NetworkBehaviour
+{
+
     //=============Player移动相关逻辑===============
     private Rigidbody rb;
     private Vector2 playerMove;//玩家移动的输入
@@ -38,7 +39,8 @@ public class PlayerLocomotionManager : NetworkBehaviour {
     private float staminaTickBlockTime = 0;
     private uint staminaRecover = 3;
 
-    private void Awake() {
+    private void Awake()
+    {
         rb = GetComponent<Rigidbody>();
         playerNetworkManager = GetComponent<PlayerNetworkManager>();
         playerAnimatorManager = GetComponent<PlayerAnimatorManager>();
@@ -46,7 +48,8 @@ public class PlayerLocomotionManager : NetworkBehaviour {
     }
 
     //接受input的输入
-    public void Move(Vector2 move, float _moveAmount){
+    public void Move(Vector2 move, float _moveAmount)
+    {
         //拿到x和y方向的输入
         playerMove = move;
         moveVertical = playerMove.y;
@@ -54,95 +57,114 @@ public class PlayerLocomotionManager : NetworkBehaviour {
         moveAmount = _moveAmount;
     }
 
-    private void HandlePlayerMovement(){
+
+    private void HandlePlayerMovement()
+    {
         if (!PlayerMoveStatus.Singleton.IsEnableMove()) { return; }
-        
+
+        float horizontalCameraRotate = PlayerCamera.Singleton.GetPlayerRotation();
+
+        Quaternion rotation = Quaternion.Euler(0, horizontalCameraRotate, 0);
+
         //玩家的移动方向以屏幕方向为基，水平移动量和竖直移动量的线性组合
-        moveDirection = 
-            (PlayerCamera.Singleton.transform.right * moveHorizontal  + 
-            PlayerCamera.Singleton.transform.forward * moveVertical).normalized * MagicNumber.Singleton.movespeed;
+        moveDirection =
+            (rotation * Vector3.right * moveHorizontal +
+            rotation * Vector3.forward * moveVertical).normalized * MagicNumber.Singleton.movespeed;
+
 
         moveDirection.y = 0;//y轴不参与移动
         rb.MovePosition(rb.position + moveDirection * moveAmount * Time.fixedDeltaTime);
-        PlayerCamera.Singleton.SetPosition(transform.position);
-        
+
         //若是在奔跑，则每秒减少耐力值
-        if(PlayerMoveStatus.Singleton.IsSprint()){
+        if (PlayerMoveStatus.Singleton.IsSprint())
+        {
             sprintDecTick += Time.fixedDeltaTime;
-            if(sprintDecTick >= SprintTickLimit){
+            if (sprintDecTick >= SprintTickLimit)
+            {
                 sprintDecTick = MagicNumber.Singleton.zeroEps;
                 playerNetworkManager.DecStamina(sprintDecNum);
             }
         }
     }
 
-    private void HandlePlayerRotation(){
-        if(!PlayerMoveStatus.Singleton.IsEnableRoate()) { return; }
+    private void HandlePlayerRotation()
+    {
+        if (!PlayerMoveStatus.Singleton.IsEnableRoate()) { return; }
 
         //玩家的旋转的旋转方向以屏幕方向为基，水平移动量和竖直移动量的线性组合
-        targetDirection = moveDirection == Vector3.zero? transform.forward : moveDirection;
+        targetDirection = moveDirection == Vector3.zero ? transform.forward : moveDirection;
         targetRotation = Quaternion.LookRotation(targetDirection);
         targetRotation = Quaternion.Slerp(transform.rotation, targetRotation, MagicNumber.Singleton.smoothTime);
         transform.rotation = targetRotation;
     }
 
     //实现玩家移动
-    private void PerformMove(){
+    private void PerformMove()
+    {
         //处理玩家移动，同步玩家位置
-        if(IsOwner){
+        if (IsOwner)
+        {
             HandlePlayerMovement();
             HandlePlayerRotation();
             AtemptedRecoverStamina();
             playerNetworkManager.PlayerPosition = transform.position;
-            playerNetworkManager.PlayerRotation = transform.rotation;            
+            playerNetworkManager.PlayerRotation = transform.rotation;
         }
-        else {
+        else
+        {
             transform.position = playerNetworkManager.PlayerPosition;
             transform.rotation = playerNetworkManager.PlayerRotation;
         }
     }
 
-    public void AtemptedPerformDodge(){
-        if(PlayerMoveStatus.Singleton.IsAnimationLocked()) { return; }//当前在播放不可以打断的动画，返回
+    public void AtemptedPerformDodge()
+    {
+        if (PlayerMoveStatus.Singleton.IsAnimationLocked()) { return; }//当前在播放不可以打断的动画，返回
 
-        if(playerNetworkManager.CurrentStamina <= 0) { return; }
+        if (playerNetworkManager.CurrentStamina <= 0) { return; }
 
-        rollDirection  = 
-            (PlayerCamera.Singleton.transform.right * moveHorizontal  + 
+        rollDirection =
+            (PlayerCamera.Singleton.transform.right * moveHorizontal +
             PlayerCamera.Singleton.transform.forward * moveVertical).normalized;
 
-            Quaternion rotation = Quaternion.LookRotation(rollDirection);
-            transform.rotation = rotation;
+        Quaternion rotation = Quaternion.LookRotation(rollDirection);
+        transform.rotation = rotation;
 
-            //玩家状态：允许根运动、锁定动画，不允许切换
-            PlayerMoveStatus.Singleton.EnableAnimationLocked();
-            PlayerMoveStatus.Singleton.EnableRootMotion();
-            //TODO：播放动画
-            
-        if (moveAmount > MagicNumber.Singleton.zeroEps){//非静止状态时，翻滚
+        //玩家状态：允许根运动、锁定动画，不允许切换
+        PlayerMoveStatus.Singleton.EnableAnimationLocked();
+        PlayerMoveStatus.Singleton.EnableRootMotion();
+        //TODO：播放动画
+
+        if (moveAmount > MagicNumber.Singleton.zeroEps)
+        {//非静止状态时，翻滚
             playerNetworkManager.PlayTargetAnimationServerRpc("Rolling");
         }
 
-        else {//否则为向后跳跃
+        else
+        {//否则为向后跳跃
             playerNetworkManager.PlayTargetAnimationServerRpc("BackStep");
         }
 
         playerNetworkManager.DecStamina(rollDec);
     }
 
-    public void AtemptedRecoverStamina(){
+    public void AtemptedRecoverStamina()
+    {
         //没有处于动画锁定状态、冲刺状态、或当前耐力值等于最大耐力值时，不能恢复
-        if (PlayerMoveStatus.Singleton.IsAnimationLocked()|| 
-            PlayerMoveStatus.Singleton.IsSprint() || 
-            playerNetworkManager.CurrentStamina == playerNetworkManager.MaxStamina) {
-                staminaTickCount = 0;
-                return;
+        if (PlayerMoveStatus.Singleton.IsAnimationLocked() ||
+            PlayerMoveStatus.Singleton.IsSprint() ||
+            playerNetworkManager.CurrentStamina == playerNetworkManager.MaxStamina)
+        {
+            staminaTickCount = 0;
+            return;
         }
         staminaTickCount += Time.fixedDeltaTime;
 
-        if(staminaTickCount >= staminaTickLimit){
+        if (staminaTickCount >= staminaTickLimit)
+        {
             staminaTickBlockTime += Time.fixedDeltaTime;
-            if(staminaTickBlockTime >= staminaTickBlockTimeLimit){
+            if (staminaTickBlockTime >= staminaTickBlockTimeLimit)
+            {
                 staminaTickBlockTime = 0;
                 staminaTickBlockTime = MagicNumber.Singleton.zeroEps;
                 playerNetworkManager.IncStamina(staminaRecover);
@@ -152,9 +174,9 @@ public class PlayerLocomotionManager : NetworkBehaviour {
     }
 
 
-    private void FixedUpdate() {
+    private void FixedUpdate()
+    {
         PerformMove();
 
     }
-
 }
